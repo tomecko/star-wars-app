@@ -1,27 +1,15 @@
 import { Machine, assign } from 'xstate';
 
+import { getNewScores, getZeroes, getNewBattle } from '../helpers';
 import { starWarsDataService } from '../services';
 
-import { ITEM_COUNT, RESOURCE_INFOS } from './config';
-
-const getWinnerIndexes = (items, getScore) => {
-  const scores = items.map(getScore);
-  const max = Math.max(...scores);
-  return max === 0
-    ? []
-    : Array.from(scores.keys()).filter((_, i) => scores[i] === max);
-}
-
-const getZeroScores = () =>
-  [...Array(ITEM_COUNT).keys()]
-    .reduce((acc, val) => ({ ...acc, [val]: 0 }), {})
+import { BATTLE_TIMEOUT, ITEM_COUNT, RESOURCE_INFOS } from './config';
 
 export const machine = Machine({
-  id: 'root',
   context: {
     battle: null,
     resourceInfo: null,
-    scores: getZeroScores(),
+    scores: getZeroes(ITEM_COUNT),
   },
   initial: 'blank',
   states: {
@@ -32,9 +20,7 @@ export const machine = Machine({
     },
     loading: {
       invoke: {
-        src: () =>
-          Promise.all(RESOURCE_INFOS.map(({ name }) =>
-            starWarsDataService.getAll(name))),
+        src: 'loadingInvoke',
         onDone: 'menu',
       },
     },
@@ -42,40 +28,31 @@ export const machine = Machine({
       on: {
         PLAY: {
           target: 'battle',
-          actions: assign({
-            resourceInfo: (_, event) => event.resourceInfo,
-          }),
+          actions: assign({ resourceInfo: (_, event) => event.resourceInfo }),
         },
       }
     },
     battle: {
       invoke: {
-        src: (context) =>
-          starWarsDataService
-            .getRandom(context.resourceInfo.name, ITEM_COUNT),
+        src: 'battleInvoke',
         onDone: {
           actions: assign(({
-            battle: (context, event) => ({
-              items: event.data,
-              winners: getWinnerIndexes(event.data, context.resourceInfo.getScore),
-            }),
-            scores: (context, event) =>
-              getWinnerIndexes(event.data, context.resourceInfo.getScore)
-                .reduce(
-                  (scores, i) => ({ ...scores, [i]: scores[i] + 1 }),
-                  context.scores,
-                ),
+            battle: getNewBattle,
+            scores: getNewScores,
           })),
         },
       },
       after: {
-        4000: 'menu',
+        [BATTLE_TIMEOUT]: 'menu',
       },
-      exit: 'clearBattle',
+      exit: assign(({ battle: null })),
     },
   },
 }, {
-  actions: {
-    clearBattle: assign(({ battle: null })),
+  services: {
+    loadingInvoke: () => Promise.all(RESOURCE_INFOS.map(({ name }) =>
+      starWarsDataService.getAll(name))),
+    battleInvoke: (context) =>
+      starWarsDataService.getRandom(context.resourceInfo.name, ITEM_COUNT),
   },
 });

@@ -1,3 +1,4 @@
+export const BATTLE_TIMEOUT = 3000;
 export const ITEM_COUNT = 2;
 
 export const RESOURCE_INFOS = [
