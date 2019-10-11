@@ -1,0 +1,8 @@
+{
+  "short_name": "Star Wars",
+  "name": "Star Wars App",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
