@@ -1,34 +1,43 @@
 import React, { useEffect } from 'react';
+import { Container, Row, Col } from 'reactstrap';
 import { useMachine } from '@xstate/react';
 
 import { machine } from '../config';
 
 import { Battle } from './Battle';
+import { Header } from './Header';
+import { Loading } from './Loading';
 import { Menu } from './Menu';
+import { Scores } from './Scores';
 
-export function App() {
-  const [current, send] = useMachine(machine);
+export function App(props) {
+  const [current, send] = useMachine(props.machine || machine);
   useEffect(() => {
     send('INIT');
   }, [send])
 
   return (
-    <div>
-      <h1>Star Wars App</h1>
-      {current.matches('loading') ? 'Loading…' : ''}
-      {current.matches('menu') ? (
-        <Menu resourceInfo={current.context.resourceInfo} send={send} />
-       ) : null}
+    <Container>
+      <Row>
+        <Col xs="12" md="8" lg="6">
+          <Header />
+          <Scores scores={current.context.scores} />
 
-      {current.matches('battle') && current.context.battle
-        ? <Battle
-            battle={current.context.battle}
-            resourceInfo={current.context.resourceInfo}
-          />
-        : null}
+          {current.matches('loading') ? <Loading /> : ''}
 
-      <pre>{JSON.stringify(current.context, null, 2)}</pre>
-    </div>
+          {current.matches('menu') ? (
+            <Menu resourceInfo={current.context.resourceInfo} send={send} />
+          ) : null}
+
+          {current.matches('battle') && current.context.battle
+            ? <Battle
+                battle={current.context.battle}
+                resourceInfo={current.context.resourceInfo}
+              />
+            : null}
+        </Col>
+      </Row>
+    </Container>
   );
 }
 

@@ -1,22 +1,27 @@
 import React from 'react';
-
-import { Item } from './Item';
+import { Badge, Card, CardGroup } from 'reactstrap';
 
 export function Battle({ battle, resourceInfo }) {
   const { items, winners } = battle;
   return (
-    <div>
-      <h2>Battle</h2>
+    <CardGroup>
       {items && items.map((item, i) => (
-        <Item
+        <Card
           key={i}
-          item={item}
-          resourceInfo={resourceInfo}
-          winner={winners.includes(i)}
-        />
+          body
+          className="text-center"
+          inverse={winners.includes(i) ? true : undefined}
+          color={winners.includes(i) ? 'primary' : undefined}
+        >
+          <p>
+            {item.name}<br/>
+            <Badge>
+              {resourceInfo.scoreDescription}: {resourceInfo.getScoreText(item)}
+            </Badge>
+          </p>
+        </Card>
       ))}
-      <pre>{JSON.stringify(items, null, 2)}</pre>
-    </div>
+    </CardGroup>
   );
 }
 
