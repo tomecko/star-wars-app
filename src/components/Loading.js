@@ -1,11 +1,13 @@
 import React from 'react';
-import { Card, Spinner } from 'reactstrap';
+import { Card, CardBody, Spinner } from 'reactstrap';
 
 export function Loading() {
   return (
-    <Card body>
-      <Spinner type="grow" size="sm" color="primary" />{' '}
-      Loading…
+    <Card>
+      <CardBody>
+        <Spinner type="grow" size="sm" color="primary" />{' '}
+        Loading…
+      </CardBody>
     </Card>
   );
 }

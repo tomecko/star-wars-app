@@ -2,19 +2,23 @@
 
 exports[`matches snapshot 1`] = `
 <div
-  className="card card-body"
+  className="card"
 >
   <div
-    className="spinner-grow-sm spinner-grow text-primary"
-    role="status"
+    className="card-body"
   >
-    <span
-      className="sr-only"
+    <div
+      className="spinner-grow-sm spinner-grow text-primary"
+      role="status"
     >
-      Loading...
-    </span>
+      <span
+        className="sr-only"
+      >
+        Loading...
+      </span>
+    </div>
+     
+    Loading…
   </div>
-   
-  Loading…
 </div>
 `;
