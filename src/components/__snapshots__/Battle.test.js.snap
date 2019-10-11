@@ -8,7 +8,9 @@ exports[`matches snapshot 1`] = `
     className="text-center card card-body"
   >
     <p>
-      n1
+      <strong>
+        n1
+      </strong>
       <br />
       <span
         className="badge badge-secondary"

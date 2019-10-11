@@ -14,7 +14,7 @@ export function Battle({ battle, resourceInfo }) {
           color={winners.includes(i) ? 'primary' : undefined}
         >
           <p>
-            {item.name}<br/>
+            <strong>{item.name}</strong><br/>
             <Badge>
               {resourceInfo.scoreDescription}: {resourceInfo.getScoreText(item)}
             </Badge>

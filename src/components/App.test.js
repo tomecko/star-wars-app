@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { act } from 'react-dom/test-utils';
 import renderer from 'react-test-renderer';
+import { Badge, Card, Progress } from 'reactstrap';
 
 import { BATTLE_TIMEOUT, machine } from '../config';
 
@@ -12,6 +13,7 @@ import { Battle } from './Battle';
 import { Header } from './Header';
 import { Loading } from './Loading';
 import { Menu } from './Menu';
+import { Scores } from './Scores';
 
 configure({ adapter: new Adapter() });
 
@@ -58,8 +60,8 @@ it('allows playing a game', async () => {
   });
   const wrapper = mount(<App machine={mockMachine} />);
 
+  // loading
   expect(wrapper.find(Header).exists()).toEqual(true);
-
   expect(wrapper.find(Loading).exists()).toEqual(true);
   expect(wrapper.find(Menu).exists()).toEqual(false);
 
@@ -68,8 +70,11 @@ it('allows playing a game', async () => {
   });
   wrapper.update();
 
+  // menu
   expect(wrapper.find(Loading).exists()).toEqual(false);
   expect(wrapper.find(Menu).exists()).toEqual(true);
+  expect(wrapper.find(Scores).find(Progress).at(0).text()).toEqual('0');
+  expect(wrapper.find(Scores).find(Progress).at(1).text()).toEqual('0');
 
   wrapper
     .find('button')
@@ -84,14 +89,26 @@ it('allows playing a game', async () => {
   });
   wrapper.update();
 
+  // battle
   expect(wrapper.find(Menu).exists()).toEqual(false);
   expect(wrapper.find(Battle).exists()).toEqual(true);
 
   jest.advanceTimersByTime(BATTLE_TIMEOUT - 1);
   wrapper.update();
-  expect(wrapper.find(Battle).exists()).toEqual(true);
 
+  expect(wrapper.find(Battle).exists()).toEqual(true);
+  expect(wrapper.find(Battle).find(Card).find('strong').at(0).text()).toEqual('name1')
+  expect(wrapper.find(Battle).find(Card).find(Badge).at(0).text()).toEqual('mass: 1');
+  expect(wrapper.find(Battle).find(Card).find('strong').at(1).text()).toEqual('name2')
+  expect(wrapper.find(Battle).find(Card).find(Badge).at(1).text()).toEqual('mass: 10');
+
+  // menu
   jest.advanceTimersByTime(1);
   wrapper.update();
+
   expect(wrapper.find(Battle).exists()).toEqual(false);
+  expect(wrapper.find(Menu).exists()).toEqual(true);
+  expect(wrapper.find(Scores).exists()).toEqual(true);
+  expect(wrapper.find(Scores).find(Progress).at(0).text()).toEqual('0');
+  expect(wrapper.find(Scores).find(Progress).at(1).text()).toEqual('1');
 });
