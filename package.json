@@ -1,5 +1,6 @@
 {
   "name": "star-wars-app",
+  "homepage": "https://tomecko.github.io/star-wars-app",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -16,7 +17,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -36,6 +39,7 @@
   "devDependencies": {
     "enzyme": "3.10.0",
     "enzyme-adapter-react-16": "1.15.1",
+    "gh-pages": "2.1.1",
     "react-test-renderer": "16.10.2"
   }
 }
