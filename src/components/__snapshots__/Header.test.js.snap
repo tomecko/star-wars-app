@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`matches snapshot 1`] = `
+<div
+  className="jumbotron"
+>
+  <h1>
+    Star Wars App
+  </h1>
+  <p>
+    Are you ready for the action?
+  </p>
+</div>
+`;

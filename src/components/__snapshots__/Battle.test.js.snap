@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`matches snapshot 1`] = `
+<div
+  className="card-group"
+>
+  <div
+    className="text-center card card-body"
+  >
+    <p>
+      n1
+      <br />
+      <span
+        className="badge badge-secondary"
+      >
+        a
+        : 
+        1
+      </span>
+    </p>
+  </div>
+</div>
+`;

@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`matches snapshot 1`] = `
+<div
+  className="card card-body"
+>
+  <div
+    className="spinner-grow-sm spinner-grow text-primary"
+    role="status"
+  >
+    <span
+      className="sr-only"
+    >
+      Loading...
+    </span>
+  </div>
+   
+  Loading…
+</div>
+`;
