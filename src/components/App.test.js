@@ -1,9 +1,33 @@
+import { configure, mount } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { act } from 'react-dom/test-utils';
 import renderer from 'react-test-renderer';
 
+import { BATTLE_TIMEOUT, machine } from '../config';
+
 import { App } from './App';
-import { machine } from '../config';
+import { Battle } from './Battle';
+import { Header } from './Header';
+import { Loading } from './Loading';
+import { Menu } from './Menu';
+
+configure({ adapter: new Adapter() });
+
+// TODO: remove when not needed
+const consoleError = console.error;
+beforeAll(() => {
+  jest.spyOn(console, 'error').mockImplementation((...args) => {
+    if ([
+      `It looks like you're using the wrong act()`,
+      'Warning: An update to %s inside a test was not wrapped in act',
+    ].every(ignored => !args[0].includes(ignored))) {
+      consoleError(...args);
+    }
+  });
+});
+// end of TODO
 
 it('renders without crashing', () => {
   const div = document.createElement('div');
@@ -19,17 +43,55 @@ test('matches snapshot', () => {
   expect(tree).toMatchSnapshot();
 });
 
-it('allows playing a game', () => {
-  const div = document.createElement('div');
+it('allows playing a game', async () => {
+ jest.useFakeTimers();
+  let loadingInvokeResolve, battleInvokeResolve;
   const mockMachine = machine.withConfig({
     services: {
-      loadingInvoke: () => Promise.resolve(),
-      battleInvoke: () => Promise.resolve([
-        { name: 'name1', a: 1 },
-        { name: 'name2', a: 10 },
-      ]),
+      loadingInvoke: () => new Promise(resolve => {
+        loadingInvokeResolve = resolve;
+      }),
+      battleInvoke: () => new Promise(resolve => {
+        battleInvokeResolve = resolve;
+      }),
     },
   });
-  ReactDOM.render(<App machine={mockMachine} />, div);
-  ReactDOM.unmountComponentAtNode(div);
+  const wrapper = mount(<App machine={mockMachine} />);
+
+  expect(wrapper.find(Header).exists()).toEqual(true);
+
+  expect(wrapper.find(Loading).exists()).toEqual(true);
+  expect(wrapper.find(Menu).exists()).toEqual(false);
+
+  await act(async () => {
+    await loadingInvokeResolve();
+  });
+  wrapper.update();
+
+  expect(wrapper.find(Loading).exists()).toEqual(false);
+  expect(wrapper.find(Menu).exists()).toEqual(true);
+
+  wrapper
+    .find('button')
+    .filterWhere(n => n.text().trim() === 'people')
+    .simulate('click');
+
+  await act(async () => {
+    await battleInvokeResolve([
+      { name: 'name1', mass: '1' },
+      { name: 'name2', mass: '10' },
+    ]);
+  });
+  wrapper.update();
+
+  expect(wrapper.find(Menu).exists()).toEqual(false);
+  expect(wrapper.find(Battle).exists()).toEqual(true);
+
+  jest.advanceTimersByTime(BATTLE_TIMEOUT - 1);
+  wrapper.update();
+  expect(wrapper.find(Battle).exists()).toEqual(true);
+
+  jest.advanceTimersByTime(1);
+  wrapper.update();
+  expect(wrapper.find(Battle).exists()).toEqual(false);
 });
