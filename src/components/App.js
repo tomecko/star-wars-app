@@ -5,6 +5,7 @@ import { useMachine } from '@xstate/react';
 import { machine } from '../config';
 
 import { Battle } from './Battle';
+import { Footer } from './Footer';
 import { Header } from './Header';
 import { Loading } from './Loading';
 import { Menu } from './Menu';
@@ -27,6 +28,10 @@ export function App(props) {
 
           {current.matches('menu') ? (
             <Menu resourceInfo={current.context.resourceInfo} send={send} />
+           ) : null}
+
+          {current.matches('loading') || current.matches('menu') ? (
+            <Footer />
           ) : null}
 
           {current.matches('battle') && current.context.battle
