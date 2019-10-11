@@ -4,12 +4,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { act } from 'react-dom/test-utils';
 import renderer from 'react-test-renderer';
-import { Badge, Card, Progress } from 'reactstrap';
+import { Badge, Button, Card, Progress } from 'reactstrap';
 
 import { BATTLE_TIMEOUT, machine } from '../config';
 
 import { App } from './App';
 import { Battle } from './Battle';
+import { Failure } from './Failure';
 import { Header } from './Header';
 import { Loading } from './Loading';
 import { Menu } from './Menu';
@@ -46,7 +47,7 @@ test('matches snapshot', () => {
 });
 
 it('allows playing a game', async () => {
- jest.useFakeTimers();
+  jest.useFakeTimers();
   let loadingInvokeResolve, battleInvokeResolve;
   const mockMachine = machine.withConfig({
     services: {
@@ -111,4 +112,49 @@ it('allows playing a game', async () => {
   expect(wrapper.find(Scores).exists()).toEqual(true);
   expect(wrapper.find(Scores).find(Progress).at(0).text()).toEqual('0');
   expect(wrapper.find(Scores).find(Progress).at(1).text()).toEqual('1');
+});
+
+it('handles download failure', async () => {
+  let loadingInvokeReject;
+  let loadingInvokePromise = new Promise((_, reject) => {
+    loadingInvokeReject = reject;
+  });
+  const mockMachine = machine.withConfig({
+    services: {
+      loadingInvoke: () => loadingInvokePromise,
+    },
+  });
+  const wrapper = mount(<App machine={mockMachine} />);
+
+  // loading
+  expect(wrapper.find(Loading).exists()).toEqual(true);
+  await act(async () => {
+    await loadingInvokeReject();
+  });
+  wrapper.update();
+
+  // failure
+  expect(wrapper.find(Failure).exists()).toEqual(true);
+
+  let loadingInvokeResolve;
+  loadingInvokePromise = new Promise(resolve => {
+    loadingInvokeResolve = resolve;
+  });
+
+  wrapper.find(Failure).find(Button).simulate('click');
+
+  // loading
+  expect(wrapper.find(Loading).exists()).toEqual(true);
+
+  await act(async () => {
+    await loadingInvokeResolve([
+      { name: 'name1', mass: '1' },
+      { name: 'name2', mass: '10' },
+    ]);
+  });
+  wrapper.update();
+
+  // menu
+  expect(wrapper.find(Loading).exists()).toEqual(false);
+  expect(wrapper.find(Menu).exists()).toEqual(true);
 });
