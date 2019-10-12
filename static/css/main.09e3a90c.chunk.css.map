@@ -1,0 +1,1 @@
+{"version":3,"sources":["index.scss"],"names":[],"mappings":"AAAA,KACE,eAAgB,CAChB,gBAAiB,CAGnB,kBAEE,kBAAmB","file":"main.09e3a90c.chunk.css","sourcesContent":["body {\n  min-width: 320px;\n  padding-top: 1rem;\n}\n\n.card,\n.card-group {\n  margin-bottom: 1rem;\n}\n"]}
