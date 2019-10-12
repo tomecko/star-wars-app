@@ -55,6 +55,10 @@ export const machine = Machine({
             scores: getNewScores,
           })),
         },
+        onError: {
+          target: 'failure',
+          actions: assign({ error: (_, event) => event.data }),
+        },
       },
       after: {
         [BATTLE_TIMEOUT]: 'menu',

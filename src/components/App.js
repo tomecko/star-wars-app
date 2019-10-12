@@ -35,16 +35,14 @@ export function App(props) {
             <Menu resourceInfo={current.context.resourceInfo} send={send} />
            ) : null}
 
-          {current.matches('loading') || current.matches('menu') ? (
-            <Footer />
-          ) : null}
-
           {current.matches('battle') && current.context.battle
             ? <Battle
                 battle={current.context.battle}
                 resourceInfo={current.context.resourceInfo}
               />
             : null}
+
+          <Footer />
         </Col>
       </Row>
     </Container>
